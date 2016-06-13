@@ -13,7 +13,7 @@ LOGDIR_BASE = "/var/log/pgmon_2ndQ/"
 ### moninfo files will be kept in LOGDIR_BASE/PG_HOST/PG_PORT
 ### edit the folowing to connect to your database
 MONDB = 'zbx_mondb' # recommendation to use dedicated database
-PG_HOST = 'localhost' if (len(sys.argv) < 2 or sys.argv[1].startswith('--')) else sys.argv[1]
+PG_HOST = 'localhost' if (len(sys.argv) < 2 or sys.argv[1].startswith('--')) else sys.argv[1] # leave empty for peer connection
 PG_PORT = '5432' if (len(sys.argv) < 3 or sys.argv[2].startswith('--')) else sys.argv[2]
 PG_USER =  'zbx_monuser'
 PG_PWD = 'zbx_monpwd'
@@ -25,7 +25,10 @@ CLEANUP_OLD_LOGS = 5
 import psycopg2
 import psycopg2.extras
 
-con = psycopg2.connect('dbname=%(MONDB)s host=%(PG_HOST)s port=%(PG_PORT)s user=%(PG_USER)s password=%(PG_PWD)s' % globals())
+if PG_HOST:
+  con = psycopg2.connect('dbname=%(MONDB)s host=%(PG_HOST)s port=%(PG_PORT)s user=%(PG_USER)s password=%(PG_PWD)s' % globals())
+else
+  con = psycopg2.connect('port=%(PG_PORT)s' % globals())
 #cur = con.cursor(cursor_factory=psycopg2.extras.DictCursor)
 cur = con.cursor()
 
