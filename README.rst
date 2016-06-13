@@ -34,6 +34,7 @@ create monitoring database and user ::
       WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB
       PASSWORD 'zbx_monpwd';
     
+    CREATE SCHEMA moninfo_2ndq;
     -- needed if zbx_monuser is not superuser
     GRANT USAGE ON SCHEMA moninfo_2ndq TO zbx_monuser;
 
