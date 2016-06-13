@@ -31,7 +31,7 @@ connections.waiting_on_lock       "more than 10%"
  
 */
 
-CREATE SCHEMA moninfo_2ndq; 
+CREATE SCHEMA IF NOT EXISTS moninfo_2ndq; 
 
 GRANT USAGE ON SCHEMA moninfo_2ndq TO monuser_2ndq;
 
