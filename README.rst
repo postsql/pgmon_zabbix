@@ -88,7 +88,13 @@ database side of zabbix monitoring for postgresql.
 Setting up the collector
 ========================
 
-first edit ./mon_collector.py and set the PG_* constants to correct values::
+first edit copy `mon_collector.py` to `/usr/local/bin` and set the executable bit ::
+
+    sudo cp mon_collector.py /usr/local/bin
+    sudo chmod +x /usr/local/bin/mon_collector.py
+    
+
+and set the PG_* constants to correct values::
 
     ### configuration
     LOGDIR_BASE = "/var/log/pgmon_2ndQ/"
@@ -117,7 +123,7 @@ that is the monitoring database, user and password or other access controls are 
 
 (You are welcome to contribute support for config files or more command line parameters)
 
-Once done, copy the mon_collector.py to /usr/local/bin and test it::
+Once done test it::
 
    sudo -u zabbix mon_collector.py
    
@@ -157,6 +163,11 @@ If not, check mail for zabbix user for cron errors ::
 
 Configuring zabbix to use the collected data
 ============================================
+
+Copy `zabbix_2ndQ.py` to `/usr/local/bin` and set the executable bit ::
+
+    sudo cp zabbix_2ndQ.py /usr/local/bin
+    sudo chmod +x /usr/local/bin/zabbix_2ndQ.py
 
 Import the provided template into zabbix
 
