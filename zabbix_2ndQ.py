@@ -15,17 +15,28 @@ if len(sys.argv) == 1:
 
 
 LOGDIR_BASE = "/var/log/pgmon_2ndQ/"
-LOGDIR = os.path.join(LOGDIR_BASE, sys.argv[1], sys.argv[2])
+LOGDIR = os.path.join(LOGDIR_BASE, sys.argv[1])
 LOGFILE = os.path.join(LOGDIR, 'latest')
+
+open(os.path.join(LOGDIR_BASE,'call.log'),'a').write('%s %s\n' % (time.time(), sys.argv))
+
 
 f = open(LOGFILE)
 
-item = sys.argv[2] + ' '
-ilen = len(item)
+args = sys.argv[2:]
+
+if len(args) == 3:
+    item = '%s[%s,%s]' % tuple(args)
+else:
+    item = sys.argv[2] + ' '
+    ilen = len(item)
 
 loglines = [line for line in f.readlines() if line.find(item)==0]
 
-value = loglines[0].split(' ',1)[1].strip()
+try:
+    value = loglines[0].split(' ',1)[1].strip()
+except:
+    value = sys.argv[1:]
 
 print value or '0'
 
