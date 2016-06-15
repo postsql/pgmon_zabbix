@@ -253,6 +253,7 @@ BEGIN
             , blk_read_time
             , blk_write_time
         FROM pg_stat_database
+       WHERE datname NOT LIKE 'template%'
     LOOP
         name := format('DB[%s,xact_commit]', res.datname); value := res.xact_commit; RETURN NEXT;
         name := format('DB[%s,xact_rollback]', res.datname); value := res.xact_rollback; RETURN NEXT;
