@@ -88,16 +88,18 @@ database side of zabbix monitoring for postgresql.
 Setting up the collector
 ========================
 
-first edit copy `mon_collector.py` to `/usr/local/bin` and set the executable bit ::
-
-    sudo cp mon_collector.py /usr/local/bin
-    sudo chmod +x /usr/local/bin/mon_collector.py
+first edit copy `mon_collector.py` to `/usr/lib/zabbix/modules/pgmon_2ndQ/` and set the executable bit ::
+    
+    sudo mkdir -p /usr/lib/zabbix/modules/pgmon_2ndQ/
+    sudo chown zabbix:zabbix /usr/lib/zabbix/modules/pgmon_2ndQ/
+    sudo cp mon_collector.py /usr/lib/zabbix/modules/pgmon_2ndQ/
+    sudo chmod +x /usr/lib/zabbix/modules/pgmon_2ndQ/mon_collector.py
     
 
 and set the PG_* constants to correct values::
 
     ### configuration
-    LOGDIR_BASE = "/var/log/pgmon_2ndQ/"
+    LOGDIR_BASE = "/var/log/zabbix/pgmon_2ndQ/"
     ### moninfo files will be kept in LOGDIR_BASE/PG_HOST/PG_PORT
     ### edit the folowing to connect to your database
     MONDB = 'zbx_mondb' # recommendation to use dedicated database
@@ -114,8 +116,8 @@ you have to create the directory LOGDIR_BASE and make it writable by the user
 who will be running the cronjob. Probably the best choice is user 'zabbix' as
 this is the used which will later consume the collected data:: 
 
-    sudo mkdir /var/log/pgmon_2ndQ/
-    sudo chown zabbix /var/log/pgmon_2ndQ/
+    sudo mkdir -p /var/log/zabbix/pgmon_2ndQ/
+    sudo chown zabbix /var/log/zabbix/pgmon_2ndQ/
 
 host and port can be specified also when calling the collector script, so you can
 use the same script for multiple servers if they are otherways set up in similar manner,
@@ -131,7 +133,7 @@ if this runs with no errors, check that you have the `LOGDIR_BASE/PG_HOST/PG_POR
 
 if this is also ok generate the user parameters for zabbix ::
 
-    sudo -u zabbix mon_collector.py --UserParameter.conf > /etc/zabbix/zabbix_agentd.d/userparameter_pgmon_zabbix.conf
+    sudo -u zabbix bash -c "/usr/lib/zabbix/modules/pgmon_2ndQ/mon_collector.py --UserParameter.conf > /etc/zabbix/zabbix_agentd.d/userparameter_pgmon_zabbix.conf"
 
 and restart zabbix agents ::
 
@@ -143,7 +145,7 @@ as a last step add mon_collector.py to crontab of user zabbix ::
     
 and add line ::
 
-    * * * * * /usr/local/bin/mon_collector.py
+    * * * * *  /usr/lib/zabbix/modules/pgmon_2ndQ/mon_collector.py
 
 to get collect monitoring info every minute.
 
@@ -152,7 +154,7 @@ See if you start getting new files in LOGDIR_BASE/PG_HOST/PG_PORT/ each minute
 Test if zabbix agent works ::
 
     # get one value for a key
-    /usr/sbin/zabbix_agentd -t pg2ndq.mon_collector.runtime
+    sudo -u zabbix /usr/sbin/zabbix_agentd -t pg2ndq.mon_collector.runtime
     
     # get all available values
     /usr/sbin/zabbix_agentd -p
@@ -164,10 +166,10 @@ If not, check mail for zabbix user for cron errors ::
 Configuring zabbix to use the collected data
 ============================================
 
-Copy `zabbix_2ndQ.py` to `/usr/local/bin` and set the executable bit ::
+Copy `zabbix_2ndQ.py` to `/usr/lib/zabbix/modules/pgmon_2ndQ/` and set the executable bit ::
 
-    sudo cp zabbix_2ndQ.py /usr/local/bin
-    sudo chmod +x /usr/local/bin/zabbix_2ndQ.py
+    sudo cp zabbix_2ndQ.py /usr/lib/zabbix/modules/pgmon_2ndQ/
+    sudo chmod +x /usr/lib/zabbix/modules/pgmon_2ndQ/zabbix_2ndQ.py
 
 Import the provided template into zabbix
 
