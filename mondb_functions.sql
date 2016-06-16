@@ -481,6 +481,8 @@ $$
         match = rxs.match(line)
         if match:
             name, value, unit = match.groups()
+            if unit == 'kB':
+                value = value+'000'
             name = re.sub('[()]','_',name)
             yield ('MEM.%s' % name, value)
 
