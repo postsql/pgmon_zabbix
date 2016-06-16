@@ -469,6 +469,24 @@ BEGIN
 END;
 $$;
 
+-- memory usage info
+
+CREATE OR REPLACE FUNCTION moninfo_2ndq.memory_sizes()
+RETURNS SETOF moninfo_2ndq.mondata_int AS
+$$
+    import re
+    rxs = re.compile(r'^([A-Za-z0-9_()]+)+: +([0-9]+) +([kB]+)?$')
+
+    for line in file('/proc/meminfo'):
+        match = rxs.match(line)
+        if match:
+            name, value, unit = match.groups()
+            name = re.sub('[()]','_',name)
+            yield ('MEM.%s' % name, value)
+
+$$ language plpythonu security definer;
+
+
 
 -- convenience function to get all info out in one call
 
@@ -494,6 +512,8 @@ AS $$
     SELECT name, value::text FROM moninfo_2ndq.pg_xlog_info()
     UNION ALL
     SELECT name, value::text FROM moninfo_2ndq.user_connections()
+    UNION ALL
+    SELECT name, value::text FROM moninfo_2ndq.memory_sizes()
     UNION ALL
     SELECT 'PGSERVER.locks_waiting', count(*)::text from pg_locks where not granted
     ORDER BY 1
