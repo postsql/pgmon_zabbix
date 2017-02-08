@@ -31,9 +31,7 @@ connections.waiting_on_lock       "more than 10%"
  
 */
 
-CREATE SCHEMA IF NOT EXISTS moninfo_2ndq; 
-
-GRANT USAGE ON SCHEMA moninfo_2ndq TO monuser_2ndq;
+CREATE SCHEMA IF NOT EXISTS moninfo_2ndq AUTHORIZATION monuser_2ndq;
 
 -- CREATE TYPE moninfo_2ndq.mondata AS (name text, value bigint);
 
