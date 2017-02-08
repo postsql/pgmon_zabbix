@@ -139,7 +139,7 @@ and restart zabbix agents ::
 
 as a last step add mon_collector.py to crontab of user zabbix ::
 
-    sudo -u zabbix crontab -e
+    sudo crontab -u zabbix -e
     
 and add line ::
 
