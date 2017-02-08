@@ -26,13 +26,11 @@ Setting up the monitoring database and and user
 
 create monitoring database and user :: 
 
-    CREATE USER zbx_monuser PASSWORD 'zbx_monpwd';
-
-    CREATE DATABASE zbx_mondb;
-
     CREATE USER zbx_monuser
       WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB
       PASSWORD 'zbx_monpwd';
+
+    CREATE DATABASE zbx_mondb WITH OWNER 'zbx_monuser';
     
     CREATE SCHEMA IF NOT EXISTS moninfo_2ndq;
     -- needed if zbx_monuser is not superuser
