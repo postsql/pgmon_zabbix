@@ -46,8 +46,8 @@ CREATE TYPE moninfo_2ndq.mondata_text AS (name text, value text);
 
 /* add missing pl/xx languages*/
 
-CREATE /*OR REPLACE*/ LANGUAGE plpythonu;;
-CREATE /*OR REPLACE*/ LANGUAGE plpgsql;
+CREATE OR REPLACE LANGUAGE plpythonu;;
+CREATE OR REPLACE LANGUAGE plpgsql;
 
 
 /*
