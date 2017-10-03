@@ -9,11 +9,11 @@ Run from cron once a minute
 import os, sys, glob, time, re, json
 
 ### configuration
-LOGDIR_BASE = "/var/log/pgmon_2ndQ/"
+LOGDIR_BASE = "/var/log/zabbix/pgmon_2ndQ/"
 ### moninfo files will be kept in LOGDIR_BASE/PG_HOST/PG_PORT
 ### edit the folowing to connect to your database
 MONDB = 'zbx_mondb' # recommendation to use dedicated database
-PG_HOST = 'localhost' if (len(sys.argv) < 2 or sys.argv[1].startswith('--')) else sys.argv[1]
+PG_HOST = 'peer' if (len(sys.argv) < 2 or sys.argv[1].startswith('--')) else sys.argv[1] # leave empty for peer connection
 PG_PORT = '5432' if (len(sys.argv) < 3 or sys.argv[2].startswith('--')) else sys.argv[2]
 PG_USER =  'zbx_monuser'
 PG_PWD = 'zbx_monpwd'
@@ -25,7 +25,11 @@ CLEANUP_OLD_LOGS = 5
 import psycopg2
 import psycopg2.extras
 
-con = psycopg2.connect('dbname=%(MONDB)s host=%(PG_HOST)s port=%(PG_PORT)s user=%(PG_USER)s password=%(PG_PWD)s' % globals())
+if PG_HOST is 'peer':
+  con = psycopg2.connect('port=%(PG_PORT)s' % globals())
+else:
+  con = psycopg2.connect('dbname=%(MONDB)s host=%(PG_HOST)s port=%(PG_PORT)s user=%(PG_USER)s password=%(PG_PWD)s' % globals())
+
 #cur = con.cursor(cursor_factory=psycopg2.extras.DictCursor)
 cur = con.cursor()
 
@@ -53,8 +57,8 @@ FILENAME = '%04d-%02d-%02dT%02d:%02d' % time.localtime(time.time())[:5]
 LOGFILE = os.path.join(LOGDIR, FILENAME)
 
 def get_discovery(res, what):
-    discfmt = "UserParameter=pg2ndq.%%(param_name)s.discovery,/usr/local/bin/zabbix_2ndQ.py %(PG_HOST)s/%(PG_PORT)s %%(param_name)s.discovery" % globals()
-    flexfmt = "UserParameter=pg2ndq.%%(param_name)s[*],/usr/local/bin/zabbix_2ndQ.py %(PG_HOST)s/%(PG_PORT)s %%(param_name)s %%(dollars)s" % globals()
+    discfmt = "UserParameter=pg2ndq.%%(param_name)s.discovery,/usr/lib/zabbix/modules/pgmon_2ndQ/zabbix_2ndQ.py %(PG_HOST)s/%(PG_PORT)s %%(param_name)s.discovery" % globals()
+    flexfmt = "UserParameter=pg2ndq.%%(param_name)s[*],/usr/lib/zabbix/modules/pgmon_2ndQ/zabbix_2ndQ.py %(PG_HOST)s/%(PG_PORT)s %%(param_name)s %%(dollars)s" % globals()
     flexible_param_rx = re.compile(r'^([A-Za-z][A-Za-z0-9_.]+)\[(.+)\]$')
     flexy_max_argc_dict = {}
     flexy_item_dict = {}
@@ -115,8 +119,8 @@ if CLEANUP_OLD_LOGS:
 
 
 if sys.argv[-1] == '--UserParameter.conf':
-    upfmt = "UserParameter=pg2ndq.%(param_name)s,/usr/local/bin/zabbix_2ndQ.py %(PG_HOST)s/%(PG_PORT)s %(param_name)s"
-    flexfmt = "UserParameter=pg2ndq.%(param_name)s[*],/usr/local/bin/zabbix_2ndQ.py %(PG_HOST)s/%(PG_PORT)s %(dollars)s"
+    upfmt = "UserParameter=pg2ndq.%(param_name)s,/usr/lib/zabbix/modules/pgmon_2ndQ/zabbix_2ndQ.py %(PG_HOST)s/%(PG_PORT)s %(param_name)s"
+    flexfmt = "UserParameter=pg2ndq.%(param_name)s[*],/usr/lib/zabbix/modules/pgmon_2ndQ/zabbix_2ndQ.py %(PG_HOST)s/%(PG_PORT)s %(dollars)s"
     print '## 2ndQ Zabbix UserParameters START ##'
     flexy_dict = {}
     item_dict = {'DB': {}, 'TABLESPACE': {} }

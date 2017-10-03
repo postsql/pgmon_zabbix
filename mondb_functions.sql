@@ -31,9 +31,7 @@ connections.waiting_on_lock       "more than 10%"
  
 */
 
-CREATE SCHEMA moninfo_2ndq; 
-
-GRANT USAGE ON SCHEMA moninfo_2ndq TO monuser_2ndq;
+CREATE SCHEMA IF NOT EXISTS moninfo_2ndq AUTHORIZATION monuser_2ndq;
 
 -- CREATE TYPE moninfo_2ndq.mondata AS (name text, value bigint);
 
@@ -46,8 +44,8 @@ CREATE TYPE moninfo_2ndq.mondata_text AS (name text, value text);
 
 /* add missing pl/xx languages*/
 
-CREATE /*OR REPLACE*/ LANGUAGE plpythonu;;
-CREATE /*OR REPLACE*/ LANGUAGE plpgsql;
+CREATE OR REPLACE LANGUAGE plpythonu;;
+CREATE OR REPLACE LANGUAGE plpgsql;
 
 
 /*
@@ -81,7 +79,7 @@ BEGIN
         ) AS states LEFT JOIN 
         (SELECT (CASE WHEN state LIKE 'idle in transaction%' THEN 'conn_idle_in_transaction'
                      WHEN state = 'idle'                     THEN 'conn_idle'
-                     WHEN waiting                            THEN 'conn_waiting_on_lock' 
+                     WHEN wait_event IS NOT NULL             THEN 'conn_waiting_on_lock' 
                                                              ELSE 'conn_running' 
                 END) AS cname, 
                 count(*) as count 
